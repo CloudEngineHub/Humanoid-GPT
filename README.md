@@ -7,9 +7,8 @@
 <p align="center">
   <a href="https://cvpr.thecvf.com/Conferences/2026"><img src="https://img.shields.io/badge/CVPR-2026-4b44ce.svg?style=flat-square" alt="CVPR 2026"></a>
   <a href="https://arxiv.org/abs/2606.03985"><img src="https://img.shields.io/badge/arXiv-2606.03985-b31b1b.svg?style=flat-square" alt="arXiv"></a>
-  <a href="https://github.com/qizekun/Humanoid-GPT"><img src="https://img.shields.io/badge/Project-Page-blue.svg?style=flat-square" alt="Project Page"></a>
+  <a href="https://qizekun.github.io/humanoid-gpt/"><img src="https://img.shields.io/badge/Project-Page-blue.svg?style=flat-square" alt="Project Page"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat-square" alt="License"></a>
-  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.12"></a>
 </p>
 
 <p align="center">
@@ -72,7 +71,7 @@ On MacOS, use `mjpython` instead of `python` for the MuJoCo viewer (e.g. `mjpyth
 We support multiple Unitree G1 hardware versions via the `G1_VERSION` env var (default `5010`). The asset folder `storage/assets/unitree_g1_${G1_VERSION}/` is selected automatically:
 
 ```bash
-python -m scripts.inference ...                   # default: 5010
+G1_VERSION=5010 python -m scripts.inference ...                   # default: 5010
 ```
 
 ---
@@ -87,10 +86,10 @@ A pre-trained tracking policy (`.onnx`) and a sample trajectory under
 python -m scripts.app
 
 # Track a single motion / a folder of motions
-python -m scripts.inference --load_path <ckpt.onnx> --mocap_path storage/test
+python -m scripts.inference --load_path storage/ckpts/pns_wo_priv216.onnx --mocap_path storage/test
 
 # Parallel evaluation over a folder of trajectories
-python -m scripts.eval_parallel --load_path <ckpt.onnx> \
+python -m scripts.eval_parallel --load_path storage/ckpts/pns_wo_priv216.onnx \
     --mocap_path storage/test --workers 32 --privileged
 
 # Visualize a reference trajectory
@@ -135,7 +134,7 @@ Humanoid-GPT/
 │                  # keypoint conversion (convert_qpos2kpt.py) and tracking metrics
 ├── 📂 scripts/    # inference.py · eval_parallel.py · vis.py · app.py (gradio demo)
 ├── 📂 deploy/     # Real-robot deployment — see deploy/DEPLOY.md
-│   ├── onboard_deploy/        # On-board (Jetson) SSH deployment + TRT bench
+│   ├── onboard_deploy/        # On-board (Jetson) SSH deployment
 │   ├── onboard_deploy_wo_GMR/ # On-board variant with host-side retargeting
 │   └── brainco/               # BrainCo dexterous-hand tracking variant
 ├── 📂 projects/   # Optional side modules
