@@ -121,6 +121,71 @@ PY
 
 `TensorrtExecutionProvider` must appear in the provider list.
 
+### 6. Noitom / Xsens online streaming (online retarget mode)
+
+Online retarget mode consumes a live mocap stream produced by the capture suit's
+PC software. Run that software on a **separate Windows machine** and stream the
+skeleton data over the network to this Linux host; GMR retargets it to the G1 in
+real time. Pick the backend with `--mocap_type` (`pnlink` for Noitom,
+`xsens` for Xsens).
+
+**Network setup (both backends).** Put the Windows PC and the Linux host on the
+same LAN — a direct Ethernet cable works best for latency, and Wi-Fi can be used
+in parallel for internet. Give each machine a static IP in the same subnet and
+verify reachability:
+
+```bash
+# Windows (cmd):  find the Ethernet adapter's IPv4 address
+ipconfig
+# Linux:          find this host's IP and ping the Windows PC
+ip addr
+ping <windows_pc_ip>
+```
+
+In the Windows software, set the **destination / target address** to this Linux
+host's **LAN IP** (not `127.0.0.1`), and make sure the **protocol** and **port**
+match the values you pass on the Linux side.
+
+#### Noitom Axis Studio (`--mocap_type pnlink`)
+
+1. Install **Axis Studio** on the Windows PC, connect the Perception Neuron suit,
+  and complete calibration.
+2. Open `Settings → BVH Broadcasting` and enable broadcasting
+  (`BVH - Capture` for live capture, or `BVH - Edit` to replay a recording).
+3. Recommended broadcast settings:
+  - Skeleton: **Axis Studio**, Rotation: **YXZ**, Displacement: **checked**
+  - Frame Format: **Binary**, *Use old header format*: **unchecked**
+  - Protocol: **UDP**
+  - Local Address: **the Windows PC LAN IP**
+  - Destination Address: `**<linux_host_ip>:<port>`**
+4. On the Linux host:
+
+```bash
+python -m deploy.play_track --real --net <nic_name> --mocap_type pnlink or xsens
+```
+
+#### Xsens MVN Analyze / Animate (`--mocap_type xsens`)
+
+1. Install **MVN Analyze / Animate** on the Windows PC, connect the Xsens suit,
+  and complete calibration.
+2. Go to `Options → Preferences → Miscellaneous → Network Streamer` (or
+  `Options → Network Streamer`) and **Add** a target destination:
+  - Host: `**<linux_host_ip>`** (the Linux machine running deploy)
+  - Port: `**9763**` (MVN default)
+  - Protocol: **TCP** or **UDP** (must match `--xsens_protocol`)
+  - Format: **Position + Orientation (Quaternion)**
+  - Enable the stream by ticking the checkbox next to it.
+3. On the Linux host (match host/port/protocol to MVN):
+
+```bash
+python -m deploy.play_track --real --net <nic_name> \
+    --mocap_type xsens --xsens_host 0.0.0.0 --xsens_port 9763 --xsens_protocol tcp
+```
+
+> `--xsens_host` is the **local bind address** of the receiver (`0.0.0.0`
+> listens on all interfaces); `--xsens_port` / `--xsens_protocol` must equal the
+> MVN Network Streamer settings above.
+
 ## Robot Bring-Up (Real Mode)
 
 For initial tests, suspend the robot for safety.
@@ -201,11 +266,14 @@ Mode keys are single-character digits; in practice, keep offline trajectories wi
 | `--onnx-walk`          | `storage/ckpts/G1-Walk/...onnx`    | Walk policy path                               |
 | `--onnx-track`         | `storage/ckpts/G1-TrackV5/...onnx` | Tracking policy path                           |
 | `--policy-type`        | `mlp`                              | Policy architecture (`mlp`)                    |
-| `--track-dir`          | `storage/test`                  | Offline trajectory folder or single `.npz`     |
+| `--track-dir`          | `storage/test`                     | Offline trajectory folder or single `.npz`     |
 | `--no-mocap`           | `False`                            | Disable online mocap in simulation             |
-| `--mocap-type`         | `pnlink`                           | `pnlink` or `optitrack`                        |
-| `--server-ip`          | `169.254.117.205`                  | Mocap server IP                                |
-| `--client-ip`          | `169.254.117.206`                  | Mocap client IP                                |
+| `--mocap-type`         | `pnlink`                           | `pnlink`, `optitrack`, or `xsens`              |
+| `--server-ip`          | `169.254.117.205`                  | Mocap server IP (OptiTrack)                    |
+| `--client-ip`          | `169.254.117.206`                  | Mocap client IP (OptiTrack)                    |
+| `--xsens-host`         | `0.0.0.0`                          | Local bind address for the Xsens receiver      |
+| `--xsens-port`         | `9763`                             | Xsens MVN Network Streamer port                |
+| `--xsens-protocol`     | `tcp`                              | Xsens stream protocol (`tcp` or `udp`)         |
 | `--human-height`       | `1.6`                              | Retargeting height prior                       |
 | `--visualize-retarget` | `True`                             | Enable retarget visualization process          |
 | `--enable-hand`        | `False`                            | Enable Dex3-1 hand control                     |

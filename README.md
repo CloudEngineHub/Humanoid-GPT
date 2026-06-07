@@ -44,6 +44,17 @@
 
 ---
 
+## TODO
+
+The following features are planned for future implementation:
+
+- ✅ Inference & deployment code.
+- ✅ Pre-trained model checkpoints (`[storage/ckpts/pns_wo_priv216.onnx](storage/ckpts/pns_wo_priv216.onnx)`).
+- Training code.
+- Training data.
+
+---
+
 ## 📦 Installation
 
 ### Prerequisites
