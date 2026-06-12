@@ -237,6 +237,16 @@ pip install -e thirdparty/noitom          # Only needed for Noitom PNLink
 
 ## Step 6: Control Interface
 
+### Jetson runtime requirement
+
+Before every real-robot run on the G1 Jetson, lock the Jetson clocks:
+
+```bash
+sudo jetson_clocks
+```
+
+Alternatively, flash the robot computer to **JetPack 6.2** and deploy with the TensorRT (`--use-trt`) runtime.
+
 ### Tracking Command
 
 ```bash
@@ -324,6 +334,9 @@ owns the terminal.  Check logs for debugging:
 # First-time setup (on G1 Jetson, via SSH)
 conda activate h-gpt
 cd ~/Humanoid-GPT
+
+# Required before each real-robot run on Jetson
+sudo jetson_clocks
 
 # Tracking
 python -m deploy.onboard_deploy.play_track_onboard --onnx_track onnx-path

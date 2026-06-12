@@ -134,6 +134,16 @@ That alone saves a few hundred MB and trims dependencies on the Jetson.
 
 ## Running
 
+### G1 Jetson runtime requirement
+
+Before every real-robot run on the G1 Jetson, lock the Jetson clocks:
+
+```bash
+sudo jetson_clocks
+```
+
+Alternatively, flash the robot computer to **JetPack 6.2** and deploy with the TensorRT (`--use-trt`) runtime.
+
 ### 1) On the workstation
 
 ```bash
@@ -180,6 +190,8 @@ include the WiFi flight time).  Anything below ~5 ms is healthy.
 ### 2a) On the G1 (Dex3 hands or no hands)
 
 ```bash
+sudo jetson_clocks
+
 python -m deploy.onboard_deploy_wo_GMR.play_track_onboard_wo_GMR \
     --onnx-track storage/ckpts/pns_wo_priv216.onnx
 ```
@@ -206,6 +218,8 @@ python -m deploy.onboard_deploy_wo_GMR.host_sender \
     --robot-ip 192.168.1.42 --enable-brainco-hand
 
 # G1
+sudo jetson_clocks
+
 python -m deploy.onboard_deploy_wo_GMR.play_track_onboard_wo_GMR_brainco \
     --onnx-track storage/ckpts/pns_wo_priv216.onnx
 ```
